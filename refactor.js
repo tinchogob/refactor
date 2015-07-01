@@ -2,6 +2,7 @@ var async = require('async');
 var request = require('request');
 var _ = require('lodash');
 var diff = require('deep-diff').diff;
+var ProgressBar = require('progress');
 
 var compare = module.exports.compare = function compare(host1, host2, paths, callback) {
 	paths.forEach(function runCase(path) {
@@ -29,17 +30,26 @@ var compare = module.exports.compare = function compare(host1, host2, paths, cal
 };
 
 var bench = module.exports.bench = function bench(hosts, paths, callback) {
+	var bar = new ProgressBar('benchmarking [:bar] :percent/ (:current from :total) :etas', {
+		complete: '=',
+		incomplete: ' ',
+		width: 20,
+		total: paths.length*hosts.length
+	});
+
 	var acumulators = {};
 
 	hosts.forEach(function createAcumulator(host, i) {
 		acumulators[host] = {
 			time: 0,
-			calls: 0
+			calls: 0,
+			errors: []
 		};
 	});
 
 	async.map(paths, function runCase(path, mapCb) {
-		
+
+
 		var clients = hosts.map(function buildClient(host) {
 			return function(path, cb) {
 
@@ -55,6 +65,7 @@ var bench = module.exports.bench = function bench(hosts, paths, callback) {
 						time: Date.now() - start.getTime()
 					};
 
+					bar.tick(1);
 					return cb(undefined, data);
 				});
 			};
@@ -71,11 +82,13 @@ var bench = module.exports.bench = function bench(hosts, paths, callback) {
 
 			results.forEach(function(result, index) {
 				if (result.error) {
-					console.log('[%s] returned error at [%s]: [%j]', path, result.host, result.error);
+					acumulators.errors.push({
+						path: path,
+						host: result.host,
+						error: result.error
+					});
 				}
-
 				// console.log("[%s][%s]: %s", result.host, result.path, result.time);
-
 				acumulators[result.host].time += result.time;
 				acumulators[result.host].calls++;
 			});

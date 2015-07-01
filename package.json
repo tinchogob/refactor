@@ -28,6 +28,7 @@
     "lodash": "*",
     "request": "*",
     "async": "*",
-    "deep-diff": "*"
+    "deep-diff": "*",
+    "progress": "*"
   }
 }

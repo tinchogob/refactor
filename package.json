@@ -1,6 +1,6 @@
 {
   "name": "refactor",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A node script to compare http responses. Designed for comparing api responses after a big refactor",
   "main": "refactor.js",
   "scripts": {

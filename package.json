@@ -1,0 +1,33 @@
+{
+  "name": "refactor",
+  "version": "0.0.1",
+  "description": "A node script to compare http responses. Designed for comparing api responses after a big refactor",
+  "main": "refactor.js",
+  "scripts": {
+    "test": "mocha test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tinchogob/refactor"
+  },
+  "keywords": [
+    "refactor",
+    "api",
+    "compare",
+    "response",
+    "http",
+    "benchmark"
+  ],
+  "author": "Martin Gonzalez",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tinchogob/refactor/issues"
+  },
+  "homepage": "https://github.com/tinchogob/refactor",
+  "dependencies": {
+    "lodash": "*",
+    "request": "*",
+    "async": "*",
+    "deep-diff": "*"
+  }
+}

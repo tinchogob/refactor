@@ -47,7 +47,7 @@ var bench = module.exports.bench = function bench(hosts, paths, callback) {
 		};
 	});
 
-	async.map(paths, function runCase(path, mapCb) {
+	async.mapLimit(paths, 5, function runCase(path, mapCb) {
 
 
 		var clients = hosts.map(function buildClient(host) {
@@ -55,7 +55,12 @@ var bench = module.exports.bench = function bench(hosts, paths, callback) {
 
 				var start = new Date();
 
-				request(host + path, function requestCb(error, response, body) {
+				var opts = {
+					uri: host+path,
+					timeout: 5000
+				};
+
+				request(opts, function requestCb(error, response, body) {
 
 					var data = {
 						host: host,
@@ -82,15 +87,16 @@ var bench = module.exports.bench = function bench(hosts, paths, callback) {
 
 			results.forEach(function(result, index) {
 				if (result.error) {
-					acumulators.errors.push({
+					acumulators[result.host].errors.push({
 						path: path,
 						host: result.host,
 						error: result.error
 					});
+				} else {
+					// console.log("[%s][%s]: %s", result.host, result.path, result.time);
+					acumulators[result.host].time += result.time;
+					acumulators[result.host].calls++;
 				}
-				// console.log("[%s][%s]: %s", result.host, result.path, result.time);
-				acumulators[result.host].time += result.time;
-				acumulators[result.host].calls++;
 			});
 
 			return mapCb();
